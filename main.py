@@ -102,3 +102,77 @@ class CofreLegendario(Cofre):
 class CofreMaldito(Cofre):
     def __init__(self):
         super().__init__("Maldito", -20)
+
+# ==========================================
+# CLASE: JUEGO CAZADOR (Administrador del flujo)
+# ==========================================
+class JuegoCazador:
+    def __init__(self):
+        self.puntaje_acumulado = 0
+
+    def seleccionar_cofre_aleatorio(self) -> Cofre:
+        """Aplica polimorfismo devolviendo un tipo de cofre aleatorio positivo."""
+        tipos_cofre = [CofreComun, CofreRaro, CofreLegendario]
+        return random.choice(tipos_cofre)()
+
+    def jugar_ronda(self):
+        print("\n" + "="*40)
+        print(" NUEVA RONDA: CONFIGURANDO CAZADOR")
+        print("="*40)
+        
+        entrada_usuario = input("Introduce la longitud de la contraseña a cazar: ")
+
+        if not entrada_usuario.isdigit():
+            raise TipoDatoInvalidoError("¡Error! Debes ingresar un número entero válido.")
+
+        longitud = int(entrada_usuario)
+        
+        password_obj = Contrasena(longitud)
+        password_generada = password_obj.generar_aleatoria()
+        
+        print(f"\n Contraseña Generada: {password_generada}")
+
+        if password_obj.validar():
+            cofre = self.seleccionar_cofre_aleatorio()
+            puntos_ganados = cofre.abrir()
+            self.puntaje_acumulado += puntos_ganados
+            print(f" ¡Éxito! Abriste un Cofre {cofre.nombre}. Sumas {puntos_ganados} puntos.")
+        
+    def procesar_error_contrasena(self):
+        """Maneja el castigo del cofre maldito si la contraseña falla."""
+        cofre_maldito = CofreMaldito()
+        puntos_perdidos = cofre_maldito.abrir()
+        self.puntaje_acumulado += puntos_perdidos
+        print(f"{cofre_maldito.nombre} ¡La contraseña era inválida! El cofre maldito te penaliza con {puntos_perdidos} puntos.")
+
+    def iniciar(self):
+        print("🎮 ¡Bienvenido a Cazador de Contraseñas v1.0!")
+        
+        jugando = True
+        while jugando:
+            try:
+                self.jugar_ronda()
+            except TipoDatoInvalidoError as e:
+                print(f"{e}")
+            except LongitudInvalidaError as e:
+                print(f"{e}")
+            except ContrasenaInvalidaError as e:
+                print(f"{e}")
+                self.procesar_error_contrasena()
+            except Exception as e:
+                print(f"Error inesperado en el sistema: {e}")
+            
+            print(f"PUNTOS ACUMULADOS: {self.puntaje_acumulado}")
+            
+            opcion = input("\n¿Deseas intentar cazar otra contraseña? (s/n): ").strip().lower()
+            if opcion != 's':
+                jugando = False
+                print("\n Gracias por jugar. ¡Tu récord final fue guardado exitosamente!")
+
+
+# ==========================================
+# PUNTO DE ENTRADA DEL PROGRAMA
+# ==========================================
+if __name__ == "__main__":
+    juego = JuegoCazador()
+    juego.iniciar()
