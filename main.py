@@ -70,4 +70,35 @@ class Contrasena:
             raise ContrasenaInvalidaError("La contraseña generada rompió las reglas de seguridad.")
         
         return True
-        
+
+# ==========================================
+# CLASES: COFRES (Herencia y Polimorfismo)
+# ==========================================
+class Cofre:
+    def __init__(self, nombre: str, puntos: int):
+        self.nombre = nombre
+        self.puntos = puntos
+
+    def abrir(self) -> int:
+        """Devuelve los puntos otorgados por el cofre."""
+        return self.puntos
+
+
+class CofreComun(Cofre):
+    def __init__(self):
+        super().__init__("Común", 10)
+
+
+class CofreRaro(Cofre):
+    def __init__(self):
+        super().__init__("Raro", 25)
+
+
+class CofreLegendario(Cofre):
+    def __init__(self):
+        super().__init__("Legendario", 50)
+
+
+class CofreMaldito(Cofre):
+    def __init__(self):
+        super().__init__("Maldito", -20)
